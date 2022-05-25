@@ -10,21 +10,25 @@ namespace ariel {
     class Node {
     private:
         std::string position;
-        Node *dad;
         std::vector<Node *> sons;
 
     public:
-        Node(std::string pos, Node *dad);
+        Node(std::string pos);
+
+        Node(Node& node) = default;
+
+        Node(Node&& node) = default;
 
         void addSon(Node *son);
-
-        void replaceDad(Node *dad);
 
         void replacePosition(std::string newPos);
 
         std::vector<Node *> &get_sons();
 
         std::string &get_pos();
+
+        Node& operator=(const Node &node) = default;
+        Node& operator=(Node &&node) = default;
 
         ~Node();
     };

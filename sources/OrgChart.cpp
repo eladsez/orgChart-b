@@ -7,13 +7,11 @@ namespace ariel {
 
     ///////////////////////////////////////////// OrgChart class //////////////////////////////////////////////
 
-    OrgChart::OrgChart() {
-        root = nullptr;
-    }
+    OrgChart::OrgChart() : root(nullptr) {}
 
-    OrgChart &OrgChart::add_root(std::string root_pos) {
+    OrgChart &OrgChart::add_root(const std::string &root_pos) {
         if (root == nullptr) {
-            this->root = new Node(root_pos, NULL);
+            this->root = new Node(root_pos);
         }
         else{
             root->replacePosition(root_pos);
@@ -21,15 +19,15 @@ namespace ariel {
         return *this;
     }
 
-    OrgChart &OrgChart::add_sub(std::string pos_dad, std::string pos_son) {
+    OrgChart &OrgChart::add_sub(const std::string &dad, const std::string &pos_son) {
         if (root == nullptr){
             throw std::runtime_error("ERROR can't add sub to empty chart.");
         }
         Iterator iter = begin_level_order();
         bool find = false;
         for (Iterator iter = begin_level_order(); iter != end_level_order(); ++iter) {
-            if (*iter == pos_dad) {
-                Node *son = new Node(pos_son, iter.get_curr());
+            if (*iter == dad) {
+                Node *son = new Node(pos_son);
                 iter.get_curr()->addSon(son);
                 find = true;
             }
@@ -57,6 +55,9 @@ namespace ariel {
     OrgChart::Iterator OrgChart::end() { return Iterator(IterType::end_level_order, root); }
 
     OrgChart::~OrgChart() {
+        if (root == nullptr){
+            return;
+        }
         std::vector<Node*> to_del;
         std::queue < Node * > queue = std::queue<Node *>();
         queue.push(root);
@@ -68,7 +69,7 @@ namespace ariel {
             queue.pop();
         }
         for (Node* node : to_del){
-            delete node;
+                delete node;
         }
     }
 
@@ -79,7 +80,7 @@ namespace ariel {
     void OrgChart::Iterator::init_level_order(Node *root) {
         std::queue < Node * > queue = std::queue<Node *>();
         queue.push(root);
-        Node *curr;
+        Node *curr = nullptr;
         while (!queue.empty()) {
             curr = queue.front();
             ordered.push_back(queue.front());
@@ -105,12 +106,12 @@ namespace ariel {
         std::stack < Node * > stack = std::stack<Node *>();
         std::queue < Node * > queue = std::queue<Node *>();
         queue.push(root);
-        Node *temp;
+        Node *temp = nullptr;
         while (!queue.empty()) {
             temp = queue.front();
             queue.pop();
             stack.push(temp);
-            for (int i = (temp->get_sons().size() - 1); i >= 0; --i) {
+            for (int i = (int)(temp->get_sons().size() - 1); i >= 0; --i) {
                 queue.push(temp->get_sons()[(size_t) i]);
             }
         }
@@ -121,6 +122,9 @@ namespace ariel {
     }
 
     OrgChart::Iterator::Iterator(IterType type, Node *root) {
+        if (root == NULL){
+            throw std::runtime_error("cant iterate on empty chart");
+        }
         ordered = std::vector<Node *>();
         if (IterType::begin_level_order == type) {
             init_level_order(root);
@@ -128,7 +132,7 @@ namespace ariel {
         }
         if (IterType::end_level_order == type) {
             init_level_order(root);
-            index = ordered.size();
+            index = (int)ordered.size();
         }
         if (IterType::begin_preorder == type) {
             init_preorder(root);
@@ -136,7 +140,7 @@ namespace ariel {
         }
         if (IterType::end_preorder == type) {
             init_preorder(root);
-            index = ordered.size();
+            index = (int)ordered.size();
         }
         if (IterType::begin_reverse_order == type) {
             init_reverse_order(root);
@@ -144,7 +148,7 @@ namespace ariel {
         }
         if (IterType::end_reverse_order == type) {
             init_reverse_order(root);
-            index = ordered.size();
+            index = (int)ordered.size();
         }
     }
 
@@ -175,9 +179,9 @@ namespace ariel {
 
     bool OrgChart::Iterator::operator!=(const Iterator &other) const { return !(*this == other); }
 
-    std::string &OrgChart::Iterator::operator*() { return get_curr()->get_pos(); }
+    std::string &OrgChart::Iterator::operator*() const{ return get_curr()->get_pos(); }
 
-    std::string *OrgChart::Iterator::operator->() { return &(get_curr()->get_pos()); }
+        std::string *OrgChart::Iterator::operator->() const{ return &(get_curr()->get_pos()); }
 
     OrgChart::Iterator::~Iterator() {}
 

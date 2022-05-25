@@ -18,12 +18,14 @@ namespace ariel {
         class Iterator; // for the OrgChart class to be able to see Iterator class
 
         OrgChart();
-        OrgChart(OrgChart& orgChart) = default;
+
         OrgChart(OrgChart&& orgChart) = default;
 
-        OrgChart &add_root(std::string root_pos);
+        OrgChart(OrgChart& orgChart) = default;
 
-        OrgChart &add_sub(std::string pos_dad, std::string pos_son);
+        OrgChart &add_root(const std::string &root_pos);
+
+        OrgChart &add_sub(const std::string &dad, const std::string &pos_son);
 
         Iterator begin_level_order();
 
@@ -43,7 +45,7 @@ namespace ariel {
 
         ~OrgChart();
 
-        OrgChart& operator=(OrgChart const &orgchart) = default;
+        OrgChart& operator=(const OrgChart &orgchart) = default;
         OrgChart& operator=(OrgChart &&orgchart) = default;
 
         friend std::ostream &operator<<(std::ostream &out, const OrgChart &org);
@@ -63,6 +65,10 @@ namespace ariel {
 
         public:
 
+            Iterator(Iterator& iter) = default;
+
+            Iterator(Iterator&& iter) = default;
+
             Iterator(IterType type, Node *root);
 
             Node *get_curr() const;
@@ -79,9 +85,12 @@ namespace ariel {
 
             Iterator operator--(int); // postfix sub
 
-            std::string &operator*();
+            std::string &operator*() const;
 
-            std::string *operator->();
+            std::string *operator->() const;
+
+            Iterator& operator=(const Iterator &iter) = default;
+            Iterator& operator=(Iterator &&iter) = default;
 
             ~Iterator();
 
